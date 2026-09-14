@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nigehbaan AI — Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-body">
+
+  <div class="login-wrapper">
+
+    <!-- Brand -->
+    <div class="login-brand">
+      <div class="login-logo">🛡</div>
+      <div class="login-brand-name">Nigehbaan AI</div>
+      <div class="login-brand-sub">Multi-Hazard Early Warning System</div>
+    </div>
+
+    <!-- Card -->
+    <div class="login-card">
+      <p class="eyebrow">Secure Command Centre</p>
+      <div class="login-card-title">Authorized Access Only</div>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash" role="alert">{{ messages[0] }}</div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <input
+            class="form-input"
+            id="username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            placeholder="Enter username"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input
+            class="form-input"
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter password"
+            required
+          >
+        </div>
+        <button type="submit" class="btn login-btn">Enter command centre →</button>
+      </form>
+    </div>
+
+    <p class="login-footer">
+      Protected by rate-limiting, HMAC credential verification &amp; secure session cookies.
+    </p>
+
+  </div>
+
+</body>
+</html>

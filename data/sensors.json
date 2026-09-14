@@ -1,0 +1,236 @@
+[
+  {
+    "id": "NG-01",
+    "location": "Murree Hills",
+    "province": "Punjab",
+    "lat": 33.907, "lng": 73.3903,
+    "rainfall_mm": 72, "river_level_m": 2.1,
+    "soil_moisture": 86, "acoustic_anomaly": 78,
+    "slope_deg": 36, "population": 620
+  },
+  {
+    "id": "NG-02",
+    "location": "Nullah Lai — Rawalpindi",
+    "province": "Punjab",
+    "lat": 33.6007, "lng": 73.0679,
+    "rainfall_mm": 64, "river_level_m": 4.6,
+    "soil_moisture": 79, "acoustic_anomaly": 22,
+    "slope_deg": 8, "population": 2100
+  },
+  {
+    "id": "NG-03",
+    "location": "Islamabad Foothills",
+    "province": "ICT",
+    "lat": 33.7294, "lng": 73.0931,
+    "rainfall_mm": 18, "river_level_m": 0.9,
+    "soil_moisture": 44, "acoustic_anomaly": 28,
+    "slope_deg": 16, "population": 980
+  },
+  {
+    "id": "NG-04",
+    "location": "Abbottabad Ridge",
+    "province": "KPK",
+    "lat": 34.1463, "lng": 73.2117,
+    "rainfall_mm": 38, "river_level_m": 1.2,
+    "soil_moisture": 62, "acoustic_anomaly": 55,
+    "slope_deg": 33, "population": 430
+  },
+  {
+    "id": "NG-05",
+    "location": "Swat Valley — Mingora",
+    "province": "KPK",
+    "lat": 34.7717, "lng": 72.3600,
+    "rainfall_mm": 88, "river_level_m": 5.2,
+    "soil_moisture": 91, "acoustic_anomaly": 83,
+    "slope_deg": 41, "population": 3200
+  },
+  {
+    "id": "NG-06",
+    "location": "Chitral — Mastuj",
+    "province": "KPK",
+    "lat": 35.8958, "lng": 71.8213,
+    "rainfall_mm": 22, "river_level_m": 1.6,
+    "soil_moisture": 48, "acoustic_anomaly": 42,
+    "slope_deg": 38, "population": 210
+  },
+  {
+    "id": "NG-07",
+    "location": "Mansehra District",
+    "province": "KPK",
+    "lat": 34.3330, "lng": 73.2000,
+    "rainfall_mm": 58, "river_level_m": 2.6,
+    "soil_moisture": 74, "acoustic_anomaly": 61,
+    "slope_deg": 32, "population": 890
+  },
+  {
+    "id": "NG-08",
+    "location": "Dir Upper — Kalkot",
+    "province": "KPK",
+    "lat": 35.2509, "lng": 71.9284,
+    "rainfall_mm": 34, "river_level_m": 1.4,
+    "soil_moisture": 55, "acoustic_anomaly": 45,
+    "slope_deg": 36, "population": 340
+  },
+  {
+    "id": "NG-09",
+    "location": "Neelum Valley",
+    "province": "AJK",
+    "lat": 34.5820, "lng": 73.9440,
+    "rainfall_mm": 75, "river_level_m": 3.8,
+    "soil_moisture": 83, "acoustic_anomaly": 70,
+    "slope_deg": 40, "population": 520
+  },
+  {
+    "id": "NG-10",
+    "location": "Jhelum River — Mirpur",
+    "province": "AJK",
+    "lat": 33.1434, "lng": 73.7503,
+    "rainfall_mm": 32, "river_level_m": 2.8,
+    "soil_moisture": 55, "acoustic_anomaly": 20,
+    "slope_deg": 10, "population": 1800
+  },
+  {
+    "id": "NG-11",
+    "location": "Hattian Bala",
+    "province": "AJK",
+    "lat": 34.0900, "lng": 73.8200,
+    "rainfall_mm": 48, "river_level_m": 1.9,
+    "soil_moisture": 68, "acoustic_anomaly": 58,
+    "slope_deg": 38, "population": 310
+  },
+  {
+    "id": "NG-12",
+    "location": "Attock — Indus Crossing",
+    "province": "Punjab",
+    "lat": 33.7665, "lng": 72.3601,
+    "rainfall_mm": 24, "river_level_m": 3.2,
+    "soil_moisture": 50, "acoustic_anomaly": 12,
+    "slope_deg": 6, "population": 2400
+  },
+  {
+    "id": "NG-13",
+    "location": "Tarbela Dam Buffer Zone",
+    "province": "KPK",
+    "lat": 33.9953, "lng": 72.6862,
+    "rainfall_mm": 44, "river_level_m": 3.9,
+    "soil_moisture": 62, "acoustic_anomaly": 18,
+    "slope_deg": 12, "population": 4100
+  },
+  {
+    "id": "NG-14",
+    "location": "Peshawar — Bara River",
+    "province": "KPK",
+    "lat": 33.9922, "lng": 71.5249,
+    "rainfall_mm": 28, "river_level_m": 2.1,
+    "soil_moisture": 48, "acoustic_anomaly": 22,
+    "slope_deg": 7, "population": 5200
+  },
+  {
+    "id": "NG-15",
+    "location": "Hunza — Karimabad",
+    "province": "Gilgit-Baltistan",
+    "lat": 36.3167, "lng": 74.6500,
+    "rainfall_mm": 12, "river_level_m": 1.1,
+    "soil_moisture": 36, "acoustic_anomaly": 60,
+    "slope_deg": 48, "population": 180
+  },
+  {
+    "id": "NG-16",
+    "location": "Gilgit River Basin",
+    "province": "Gilgit-Baltistan",
+    "lat": 35.9208, "lng": 74.3083,
+    "rainfall_mm": 10, "river_level_m": 1.3,
+    "soil_moisture": 32, "acoustic_anomaly": 50,
+    "slope_deg": 44, "population": 260
+  },
+  {
+    "id": "NG-17",
+    "location": "Sukkur Barrage — Sindh",
+    "province": "Sindh",
+    "lat": 27.7052, "lng": 68.8574,
+    "rainfall_mm": 28, "river_level_m": 4.1,
+    "soil_moisture": 58, "acoustic_anomaly": 8,
+    "slope_deg": 2, "population": 6800
+  },
+  {
+    "id": "NG-18",
+    "location": "Dadu — Indus Floodplain",
+    "province": "Sindh",
+    "lat": 26.7318, "lng": 67.7750,
+    "rainfall_mm": 62, "river_level_m": 4.8,
+    "soil_moisture": 78, "acoustic_anomaly": 8,
+    "slope_deg": 2, "population": 9200
+  },
+  {
+    "id": "NG-19",
+    "location": "Dera Ghazi Khan — Koh Sulaiman",
+    "province": "Punjab",
+    "lat": 30.0564, "lng": 70.6349,
+    "rainfall_mm": 42, "river_level_m": 2.0,
+    "soil_moisture": 60, "acoustic_anomaly": 44,
+    "slope_deg": 26, "population": 1100
+  },
+  {
+    "id": "NG-20",
+    "location": "Quetta — Bolan Pass",
+    "province": "Balochistan",
+    "lat": 29.8850, "lng": 67.0104,
+    "rainfall_mm": 18, "river_level_m": 0.8,
+    "soil_moisture": 38, "acoustic_anomaly": 35,
+    "slope_deg": 30, "population": 720
+  },
+  {
+    "id": "NG-21",
+    "location": "Charsadda — Kabul River",
+    "province": "KPK",
+    "lat": 34.1453, "lng": 71.7307,
+    "rainfall_mm": 68, "river_level_m": 4.2,
+    "soil_moisture": 76, "acoustic_anomaly": 22,
+    "slope_deg": 6, "population": 3800
+  },
+  {
+    "id": "NG-22",
+    "location": "Nowshera — Kabul-Swat Confluence",
+    "province": "KPK",
+    "lat": 34.0153, "lng": 71.9747,
+    "rainfall_mm": 74, "river_level_m": 5.4,
+    "soil_moisture": 84, "acoustic_anomaly": 16,
+    "slope_deg": 4, "population": 7600
+  },
+  {
+    "id": "NG-23",
+    "location": "Skardu Valley",
+    "province": "Gilgit-Baltistan",
+    "lat": 35.2971, "lng": 75.6372,
+    "rainfall_mm": 8, "river_level_m": 0.9,
+    "soil_moisture": 28, "acoustic_anomaly": 44,
+    "slope_deg": 42, "population": 140
+  },
+  {
+    "id": "NG-24",
+    "location": "Larkana — Indus East Bank",
+    "province": "Sindh",
+    "lat": 27.5580, "lng": 68.2120,
+    "rainfall_mm": 52, "river_level_m": 4.3,
+    "soil_moisture": 72, "acoustic_anomaly": 7,
+    "slope_deg": 2, "population": 8100
+  },
+  {
+    "id": "NG-25",
+    "location": "Lahore — Ravi Riverbank",
+    "province": "Punjab",
+    "lat": 31.5497, "lng": 74.3436,
+    "rainfall_mm": 12, "river_level_m": 1.4,
+    "soil_moisture": 38, "acoustic_anomaly": 8,
+    "slope_deg": 3, "population": 12400
+  },
+  {
+    "id": "NG-26",
+    "location": "Karachi — Malir Basin",
+    "province": "Sindh",
+    "lat": 24.8607, "lng": 67.0011,
+    "rainfall_mm": 6, "river_level_m": 0.4,
+    "soil_moisture": 22, "acoustic_anomaly": 5,
+    "slope_deg": 2, "population": 18600
+  }
+]

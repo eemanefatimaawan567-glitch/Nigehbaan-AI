@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nigehbaan AI — Hazard Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+<div class="shell">
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOP NAV
+════════════════════════════════════════════════════════════ -->
+<nav class="topnav" role="navigation" aria-label="Main navigation">
+  <div class="nav-brand">
+    <div class="nav-logo" aria-hidden="true">🛡</div>
+    <div>
+      <div class="nav-title">Nigehbaan AI</div>
+      <div class="nav-sub">Multi-Hazard Early Warning System</div>
+    </div>
+  </div>
+  <div class="nav-actions">
+    <span class="live-dot" aria-live="polite">Live</span>
+    <button class="btn btn-ghost" onclick="refreshData()" id="refreshBtn" aria-label="Simulate next sensor reading">
+      <span id="refreshIcon" aria-hidden="true">↻</span> Simulate
+    </button>
+    <button class="btn btn-live" onclick="fetchLiveWeather()" id="liveBtn" aria-label="Fetch live Open-Meteo weather data">
+      🌐 Live Weather
+    </button>
+    <button class="btn btn-alert-trigger" onclick="openAlertModal(null)" aria-label="Send emergency alert">
+      🚨 Send Alert
+    </button>
+    <form method="post" action="{{ url_for('logout') }}" style="margin:0">
+      <button class="btn btn-ghost" type="submit" aria-label="Logout">⎋ Logout</button>
+    </form>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-inner">
+    <p class="eyebrow">Acoustic · Hydrological · Geotechnical Intelligence</p>
+    <h1 id="hero-title">Nigehbaan AI</h1>
+    <p class="subtitle">
+      Real-time flood and landslide risk scoring across Pakistan — combining
+      river-level sensing, soil saturation, acoustic sub-surface anomalies,
+      and population density to rank rescue priorities before disaster strikes.
+    </p>
+    <div class="hero-tags" aria-label="Technology tags">
+      <span class="hero-tag">🇵🇰 Pakistan</span>
+      <span class="hero-tag">26 Active Zones</span>
+      <span class="hero-tag">7 Provinces</span>
+      <span class="hero-tag">AI Risk Scoring</span>
+      <span class="hero-tag">NLP Alert Generation</span>
+      <span class="hero-tag">🌐 Live Weather Data</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATS BAR
+════════════════════════════════════════════════════════════ -->
+<section class="stats" aria-label="Summary statistics">
+  <div class="stat">
+    <div class="stat-icon" aria-hidden="true">📡</div>
+    <div class="stat-value" id="zoneCount">{{ sensors|length }}</div>
+    <div class="stat-label">Sensor Zones</div>
+  </div>
+  <div class="stat danger">
+    <div class="stat-icon" aria-hidden="true">⚠️</div>
+    <div class="stat-value" id="dangerCount">{{ sensors|selectattr("risk.level","in",["CRITICAL","HIGH"])|list|length }}</div>
+    <div class="stat-label">Critical / High</div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon" aria-hidden="true">👥</div>
+    <div class="stat-value" id="popCount">{{ "{:,}".format(sensors|sum(attribute="population")) }}</div>
+    <div class="stat-label">People at Risk</div>
+  </div>
+  <div class="stat accent">
+    <div class="stat-icon" aria-hidden="true">🚨</div>
+    <div class="stat-value" id="topZone" style="font-size:clamp(12px,1.6vw,18px);line-height:1.3">{{ sensors[0].location }}</div>
+    <div class="stat-label">Top Rescue Zone</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAP
+════════════════════════════════════════════════════════════ -->
+<section class="map-section" aria-labelledby="map-title">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Situational Awareness</p>
+      <h2 id="map-title">Live Hazard Map</h2>
+    </div>
+    <div class="map-legend" aria-label="Risk level legend">
+      <span class="legend-item critical">CRITICAL</span>
+      <span class="legend-item high">HIGH</span>
+      <span class="legend-item moderate">MODERATE</span>
+      <span class="legend-item low">LOW</span>
+    </div>
+  </div>
+  <div class="map-wrap">
+    <div id="map" role="application" aria-label="Interactive hazard map showing 26 monitored zones across Pakistan"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     RISK CARDS
+════════════════════════════════════════════════════════════ -->
+<section class="cards-section" aria-labelledby="zones-title">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Risk Intelligence</p>
+      <h2 id="zones-title">Priority Zones</h2>
+    </div>
+    <div class="filter-row" role="group" aria-label="Filter by risk level">
+      <button class="filter-btn active" data-filter="all" onclick="filterCards(this,'all')">All</button>
+      <button class="filter-btn" data-filter="critical" onclick="filterCards(this,'critical')">Critical</button>
+      <button class="filter-btn" data-filter="high" onclick="filterCards(this,'high')">High</button>
+      <button class="filter-btn" data-filter="moderate" onclick="filterCards(this,'moderate')">Moderate</button>
+      <button class="filter-btn" data-filter="low" onclick="filterCards(this,'low')">Low</button>
+    </div>
+  </div>
+
+  <div id="cards" class="grid">
+    {% for s in sensors %}
+    <article class="card level-{{ s.risk.level|lower }}" data-level="{{ s.risk.level|lower }}" aria-label="{{ s.location }} risk card">
+      <div class="card-top">
+        <div>
+          <div class="sensor-meta">
+            <span class="sensor-id">{{ s.id }}</span>
+            <span class="sensor-province">{{ s.get('province','—') }}</span>
+            {% if s.get('weather_live') %}<span class="live-badge">🌐 Live</span>{% endif %}
+          </div>
+          <h3>{{ s.location }}</h3>
+        </div>
+        <div class="card-top-right">
+          <span class="badge {{ s.risk.level|lower }}" role="status">{{ s.risk.level }}</span>
+          <button class="card-alert-btn" onclick="openAlertModal('{{ s.location }}','{{ s.risk.level }}')" aria-label="Send alert for {{ s.location }}" title="Send alert">🚨</button>
+        </div>
+      </div>
+
+      <!-- AI Summary -->
+      {% if s.get('ai_summary') %}
+      <div class="ai-summary">
+        <span class="ai-label">🤖 AI</span>
+        <p>{{ s.ai_summary }}</p>
+      </div>
+      {% endif %}
+
+      <div class="risk-row">
+        <div class="risk-box">
+          <div class="risk-box-label">Overall Risk</div>
+          <div class="risk-box-value">{{ s.risk.overall_score }}<span class="unit">%</span></div>
+        </div>
+        <div class="risk-box">
+          <div class="risk-box-label">Rescue Priority</div>
+          <div class="risk-box-value">{{ s.risk.rescue_priority }}</div>
+        </div>
+        <div class="risk-box confidence-box">
+          <div class="risk-box-label">AI Confidence</div>
+          <div class="risk-box-value conf-value" data-conf="{{ s.risk.confidence }}">{{ s.risk.confidence }}<span class="unit">%</span></div>
+        </div>
+      </div>
+
+      <div class="meters">
+        <div class="meter-line">
+          <span class="meter-label">Flood</span>
+          <div class="meter-track" role="progressbar" aria-valuenow="{{ s.risk.flood_score }}" aria-valuemin="0" aria-valuemax="100" aria-label="Flood risk {{ s.risk.flood_score }}%">
+            <div class="meter-fill flood" style="width:{{ s.risk.flood_score }}%"></div>
+          </div>
+          <span class="meter-pct">{{ s.risk.flood_score }}%</span>
+        </div>
+        <div class="meter-line">
+          <span class="meter-label">Landslide</span>
+          <div class="meter-track" role="progressbar" aria-valuenow="{{ s.risk.landslide_score }}" aria-valuemin="0" aria-valuemax="100" aria-label="Landslide risk {{ s.risk.landslide_score }}%">
+            <div class="meter-fill landslide" style="width:{{ s.risk.landslide_score }}%"></div>
+          </div>
+          <span class="meter-pct">{{ s.risk.landslide_score }}%</span>
+        </div>
+      </div>
+
+      <div class="sensor-grid">
+        <div class="sensor-cell"><div class="cell-label">Rainfall</div><div class="cell-value">{{ s.rainfall_mm }}<span class="unit"> mm</span></div></div>
+        <div class="sensor-cell"><div class="cell-label">River</div><div class="cell-value">{{ s.river_level_m }}<span class="unit"> m</span></div></div>
+        <div class="sensor-cell"><div class="cell-label">Soil</div><div class="cell-value">{{ s.soil_moisture }}<span class="unit">%</span></div></div>
+        <div class="sensor-cell"><div class="cell-label">Acoustic</div><div class="cell-value">{{ s.acoustic_anomaly }}<span class="unit">%</span></div></div>
+      </div>
+
+      <div class="reason">
+        <div class="reason-label">Why flagged</div>
+        <div class="reason-tags">
+          {% for r in s.risk.reasons %}<span class="reason-tag">{{ r }}</span>{% endfor %}
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ALERT LOG
+════════════════════════════════════════════════════════════ -->
+<section class="alert-log-section" aria-labelledby="alerts-title">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Command &amp; Control</p>
+      <h2 id="alerts-title">Alert History</h2>
+    </div>
+  </div>
+  <div class="alert-log-wrap" id="alertLog">
+    {% if alerts %}
+      {% for a in alerts %}
+      <div class="alert-row level-{{ a.level|lower }}">
+        <span class="alert-row-badge {{ a.level|lower }}">{{ a.level }}</span>
+        <div class="alert-row-body">
+          <strong>{{ a.zone }}</strong>
+          <p>{{ a.message }}</p>
+          {% if a.channels %}<div class="alert-channels">{% for c in a.channels %}<span class="channel-tag">{{ c }}</span>{% endfor %}</div>{% endif %}
+        </div>
+        <div class="alert-row-meta">
+          <span class="alert-id">{{ a.id }}</span>
+          <span class="alert-time">{{ a.sent_at }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert-empty" id="alertEmpty">
+        <span aria-hidden="true">🛡</span>
+        <p>No alerts issued yet. Use the <strong>Send Alert</strong> button to dispatch an emergency notification.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════════════════════════ -->
+<section class="how-section" aria-labelledby="how-title">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Technology</p>
+      <h2 id="how-title">How Nigehbaan Works</h2>
+    </div>
+  </div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-icon" aria-hidden="true">📡</div>
+      <h3>Multi-Channel Sensing</h3>
+      <p>Each zone combines four environmental channels: rainfall intensity, river gauge level, soil saturation, and sub-surface acoustic anomaly — capturing both flood and landslide precursors simultaneously.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-icon" aria-hidden="true">🧮</div>
+      <h3>Dual Risk Scoring</h3>
+      <p>Separate flood and landslide sub-scores are computed with weighted sensor inputs and slope data. An overall score blends both hazards — so a zone doesn't need to fail just one threshold to be flagged.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-icon" aria-hidden="true">🚑</div>
+      <h3>Rescue Prioritization</h3>
+      <p>Zones are ranked by rescue priority — a function of overall risk and population density. High-risk rural areas and dense urban flood plains are ranked independently, so no affected community is overlooked.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-icon" aria-hidden="true">🔔</div>
+      <h3>Alert Dispatch</h3>
+      <p>Operators can issue multi-channel alerts — SMS, Rescue 1122, NDMA coordination — directly from the command centre. Every alert is logged with timestamp, level, and zone for accountability and audit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA ROADMAP / PARTNERS
+════════════════════════════════════════════════════════════ -->
+<section class="roadmap-section" aria-labelledby="roadmap-title">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Data &amp; Partnerships</p>
+      <h2 id="roadmap-title">Real-World Data Roadmap</h2>
+    </div>
+  </div>
+
+  <div class="roadmap-note" role="note">
+    <span class="roadmap-note-icon" aria-hidden="true">ℹ️</span>
+    <p>The current MVP uses <strong>simulated sensor data</strong> to demonstrate the platform. The roadmap below shows exactly how each channel transitions to real field data before pilot deployment.</p>
+  </div>
+
+  <div class="roadmap-grid">
+    <div class="roadmap-card">
+      <div class="roadmap-phase">Phase 1 · MVP</div>
+      <h3>Simulated Signals</h3>
+      <ul>
+        <li>Physics-based sensor simulation</li>
+        <li>Realistic Pakistani geography &amp; demographics</li>
+        <li>Validated risk formula against NDMA 2022 flood event data</li>
+        <li>Full dashboard, alert, and API layer</li>
+      </ul>
+      <span class="phase-badge done">✓ Complete</span>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-phase">Phase 2 · Pilot</div>
+      <h3>Partner Data Integration</h3>
+      <ul>
+        <li><strong>PMD</strong> — Pakistan Met Department rainfall &amp; river gauges</li>
+        <li><strong>SUPARCO</strong> — Satellite soil moisture (SAR imagery)</li>
+        <li><strong>NDMA</strong> — Historical disaster event ground truth</li>
+        <li>5-zone KPK pilot with IoT acoustic sensors</li>
+      </ul>
+      <span class="phase-badge upcoming">Q2 2025</span>
+    </div>
+    <div class="roadmap-card">
+      <div class="roadmap-phase">Phase 3 · Scale</div>
+      <h3>National Deployment</h3>
+      <ul>
+        <li>100+ sensor zones across all provinces</li>
+        <li>ML model trained on labeled PMD + NDMA event data</li>
+        <li>SMS alerts via Jazz/Zong emergency broadcast</li>
+        <li>Integration with Rescue 1122 dispatch systems</li>
+      </ul>
+      <span class="phase-badge upcoming">Q4 2025</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AI ANALYTICS
+════════════════════════════════════════════════════════════ -->
+<section class="analytics-section" aria-labelledby="analytics-title">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Machine Learning · RandomForest Ensemble</p>
+      <h2 id="analytics-title">AI Model Analytics</h2>
+    </div>
+    <div class="model-accuracy-badge" id="modelAccBadge">
+      <span class="model-acc-label">Model Accuracy</span>
+      <span class="model-acc-value" id="modelAccVal">—</span>
+    </div>
+  </div>
+
+  <div class="analytics-grid">
+
+    <!-- Risk Distribution Donut -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Risk Distribution</div>
+        <div class="chart-card-sub">Across 26 monitored zones</div>
+      </div>
+      <div class="chart-wrap chart-wrap-sm">
+        <canvas id="riskDonut" aria-label="Risk level distribution donut chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Feature Importance -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Feature Importance</div>
+        <div class="chart-card-sub">What drives the AI risk score</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="featureBar" aria-label="ML feature importance bar chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Population at Risk -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Population at Risk</div>
+        <div class="chart-card-sub">People in each risk category</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="popBar" aria-label="Population at risk by level bar chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Province Heatmap -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Province Risk Breakdown</div>
+        <div class="chart-card-sub">Critical + High zones per province</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="provinceBar" aria-label="Province risk bar chart"></canvas>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TRACTION
+════════════════════════════════════════════════════════════ -->
+<section class="traction-section" aria-labelledby="traction-title">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Why Now</p>
+      <h2 id="traction-title">The Problem is Urgent</h2>
+    </div>
+  </div>
+  <div class="traction-grid">
+    <div class="traction-stat">
+      <div class="traction-num">$30B+</div>
+      <div class="traction-label">Flood damage in Pakistan, 2022 monsoon season alone</div>
+    </div>
+    <div class="traction-stat">
+      <div class="traction-num">33M</div>
+      <div class="traction-label">People displaced by floods in Pakistan in 2022</div>
+    </div>
+    <div class="traction-stat">
+      <div class="traction-num">72 hrs</div>
+      <div class="traction-label">Avg. warning lead time currently available to NDMA</div>
+    </div>
+    <div class="traction-stat highlight">
+      <div class="traction-num">&lt; 5 min</div>
+      <div class="traction-label">Nigehbaan risk score update &amp; alert dispatch time</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-brand">
+    <span class="footer-logo" aria-hidden="true">🛡</span>
+    <div>
+      <div class="footer-name">Nigehbaan AI</div>
+      <div class="footer-tag">Guardian of Lives · نگہبان</div>
+    </div>
+  </div>
+  <div class="footer-center">
+    <span class="footer-badge">Hackathon MVP · 2026</span>
+  </div>
+  <div class="footer-copy">Built for Pakistan's most vulnerable communities</div>
+</footer>
+
+</div><!-- /shell -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ALERT MODAL
+════════════════════════════════════════════════════════════ -->
+<div id="alertModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <p class="eyebrow">Command Centre</p>
+        <h2 id="modalTitle">Dispatch Emergency Alert</h2>
+      </div>
+      <button class="modal-close" onclick="closeAlertModal()" aria-label="Close alert modal">✕</button>
+    </div>
+
+    <form id="alertForm" onsubmit="submitAlert(event)" novalidate>
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label class="form-label" for="alertZone">Zone / Location</label>
+          <input class="form-input" id="alertZone" name="zone" placeholder="e.g. Swat Valley — Mingora" required maxlength="120">
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="alertLevel">Risk Level</label>
+            <select class="form-input form-select" id="alertLevel" name="level" required>
+              <option value="">Select level…</option>
+              <option value="CRITICAL">🔴 CRITICAL</option>
+              <option value="HIGH">🟠 HIGH</option>
+              <option value="MODERATE">🟡 MODERATE</option>
+              <option value="LOW">🟢 LOW</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dispatch Channels</label>
+            <div class="channel-checks">
+              <label class="check-label"><input type="checkbox" name="channels" value="SMS Broadcast"> SMS Broadcast</label>
+              <label class="check-label"><input type="checkbox" name="channels" value="Rescue 1122"> Rescue 1122</label>
+              <label class="check-label"><input type="checkbox" name="channels" value="NDMA"> NDMA</label>
+              <label class="check-label"><input type="checkbox" name="channels" value="District Admin"> District Admin</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="alertMsg">Alert Message <span class="form-optional">(optional)</span></label>
+          <textarea class="form-input form-textarea" id="alertMsg" name="message" placeholder="Describe the hazard situation and recommended actions…" maxlength="500" rows="3"></textarea>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeAlertModal()">Cancel</button>
+        <button type="submit" class="btn btn-danger" id="alertSubmitBtn">
+          <span id="alertSubmitText">🚨 Dispatch Alert</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Data island -->
+<script id="initialData" type="application/json">{{ sensors|tojson }}</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+</html>
