@@ -34,7 +34,7 @@ It produces:
 - A **rescue priority rank** — weighted by risk AND population density
 - A **human-readable reason list** (e.g. "Heavy rainfall · Soil saturation · Steep terrain")
 
-Rescue coordinators can then **dispatch alerts** to SMS broadcast, Rescue 1122, NDMA, or district administration — all logged for accountability.
+Rescue coordinators can use the prototype to **prepare and log alert-dispatch actions** for channels such as SMS broadcast, Rescue 1122, NDMA, or district administration. These external channels are demonstration targets in the current MVP; production deployment requires approved integrations.
 
 ---
 
@@ -115,11 +115,15 @@ Authenticated. Adds a new sensor zone.
 
 ---
 
+## Competition / Commercialization
+
+For the 2026 Wujiaochang competition, see **[Competition Brief](COMPETITION_WUJIAOCHANG_2026.md)** for the customer, business-model, validation and commercialization plan.
+
 ## Data Roadmap
 
 ### Phase 1 · MVP (Complete ✓)
 - Physics-based sensor simulation with realistic Pakistani geography
-- Validated risk scoring formula against NDMA 2022 flood event patterns
+- Risk-scoring prototype designed around disaster-domain thresholds; field validation still required
 - Full dashboard, alert dispatch, and API layer
 - 24 zones across 6 provinces
 
@@ -155,9 +159,9 @@ Authenticated. Adds a new sensor zone.
 
 ---
 
-## Honesty Note
+## Validation & Honesty Note
 
-This prototype uses **simulated acoustic anomaly data.** A production deployment requires calibrated field sensors, labeled training data, and validation with geotechnical experts. All other sensor channels (rainfall, river level, soil moisture) can be sourced directly from PMD APIs — acoustic is the one channel requiring physical hardware deployment.
+This prototype uses **simulated acoustic anomaly data**, and its ML classifier is trained/tested on **synthetic sensor records**. Any model accuracy shown in the dashboard is therefore internal synthetic-test performance, **not field-validated disaster-prediction accuracy**. A production deployment requires calibrated field sensors, authoritative historical-event back-testing, labeled real-world data, domain-expert review and a bounded pilot. Live rainfall and surface-soil-moisture enrichment is currently available through Open-Meteo; other operational feeds and agency integrations remain future work.
 
 ---
 
